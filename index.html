@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guía visual · Del cubo OLAP al dashboard</title>
+<style>
+:root{--azul:#12306b;--azul2:#2f5fc4;--cel:#e8f0fe;--rojo:#d92b3a;--ver:#1f9d63;--nar:#f08a24;--mor:#7b4fd1;--gris:#5b6475;--bg:#f6f8fc;--card:#fff;--bd:#d9e0ef}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:#1b2230;line-height:1.55}
+header{background:linear-gradient(135deg,#12306b,#2f5fc4 60%,#7b4fd1);color:#fff;padding:42px 24px 34px;text-align:center}
+header h1{margin:0 0 8px;font-size:34px}header p{margin:0 auto;max-width:760px;opacity:.92;font-size:17px}
+nav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--bd);display:flex;gap:4px;overflow-x:auto;padding:8px 12px;justify-content:center;flex-wrap:wrap}
+nav a{color:var(--azul);text-decoration:none;padding:6px 11px;border-radius:999px;font-size:13.5px;white-space:nowrap}
+nav a:hover{background:var(--cel)}
+main{max-width:1080px;margin:0 auto;padding:10px 20px 60px}
+section{margin:46px 0}
+h2{font-size:26px;color:var(--azul);margin:0 0 6px;display:flex;align-items:center;gap:10px}
+h2 .n{background:var(--azul);color:#fff;width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;font-size:16px}
+.lead{color:var(--gris);margin:0 0 16px;font-size:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 3px rgba(18,48,107,.06)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.app{border-top:5px solid var(--c,#2f5fc4)}.app h3{margin:0 0 2px;font-size:18px}.app .tag{font-size:12px;color:#fff;background:var(--c,#2f5fc4);border-radius:999px;padding:2px 9px;display:inline-block;margin-bottom:8px}
+.app dl{margin:8px 0 0}.app dt{font-weight:700;font-size:13px;color:var(--azul);margin-top:8px}.app dd{margin:2px 0 0;font-size:14.5px}
+svg{max-width:100%;height:auto;display:block;margin:10px auto}
+.note{background:#fff7e0;border:1px solid #ecd48a;border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14.5px}
+.tip{background:#e9f8f0;border:1px solid #a8dcc2;border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14.5px}
+code,pre{font-family:Consolas,Menlo,monospace}code{background:#eef1f8;padding:1px 6px;border-radius:5px;font-size:13.5px}
+pre{background:#0f1830;color:#dfe8ff;padding:12px 14px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.45;margin:8px 0}
+pre .c{color:#8aa0d6}pre .k{color:#ffb86b}pre .s{color:#8be9a8}
+table{border-collapse:collapse;width:100%;font-size:14.5px;margin:10px 0}th{background:var(--azul);color:#fff;text-align:left;padding:8px 10px}td{border:1px solid var(--bd);padding:7px 10px;vertical-align:top;background:#fff}
+details{background:#fff;border:1px solid var(--bd);border-radius:12px;margin:10px 0;padding:0 16px}summary{cursor:pointer;font-weight:700;padding:12px 0;color:var(--azul)}
+details[open]{box-shadow:0 2px 8px rgba(18,48,107,.08)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.two{grid-template-columns:1fr}}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;color:#fff;margin-right:4px}
+.step{display:flex;gap:14px;align-items:flex-start;margin:10px 0}.step .b{flex:0 0 38px;height:38px;border-radius:50%;background:var(--azul2);color:#fff;display:grid;place-items:center;font-weight:700}
+.step .t{flex:1}.step h4{margin:0 0 3px}
+.sel{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:8px 0}.sel select{padding:7px 10px;border-radius:8px;border:1px solid var(--bd);font-size:15px}
+.big{font-size:30px;font-weight:800;color:var(--azul)}
+.tl{border-left:4px solid var(--azul2);margin:14px 0 14px 10px;padding-left:18px}.tl .it{position:relative;margin:0 0 16px}
+.tl .it:before{content:"";position:absolute;left:-26px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--rojo);border:3px solid #fff;box-shadow:0 0 0 2px var(--rojo)}
+.tl .it.ok:before{background:var(--ver);box-shadow:0 0 0 2px var(--ver)}
+.glos dt{font-weight:700;color:var(--azul);margin-top:10px}.glos dd{margin:2px 0 0}
+@keyframes dash{to{stroke-dashoffset:-24}}.flow{stroke-dasharray:8 6;animation:dash 1.2s linear infinite}
+@keyframes pulse{50%{opacity:.35}}.pulse{animation:pulse 1.6s ease-in-out infinite}
+footer{text-align:center;color:var(--gris);padding:20px;font-size:13px}
+
+/* --- ajustes para teléfono --- */
+html{-webkit-text-size-adjust:100%}
+table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+pre{-webkit-overflow-scrolling:touch}
+.card,details{overflow-x:auto}
+@media(max-width:700px){
+  header{padding:28px 16px 24px}header h1{font-size:25px}header p{font-size:15px}
+  main{padding:6px 12px 50px}h2{font-size:21px}
+  nav{justify-content:flex-start;flex-wrap:nowrap}
+  svg[viewBox*=" 900 "],svg[viewBox*=" 960 "],svg[viewBox*=" 1000 "]{min-width:720px}
+  .card:has(> svg[viewBox*=" 900 "]),.card:has(> svg[viewBox*=" 960 "]),.card:has(> svg[viewBox*=" 1000 "]){overflow-x:auto}
+  .step{gap:10px}.big{font-size:24px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Del cubo OLAP al dashboard</h1>
+  <p>Guía visual para entender <b>todo</b> lo que hicimos en el Desafío Práctico 2: qué es cada programa, cómo está hecha la base de datos, cómo funciona el cubo y por qué cada paso existe.</p>
+</header>
+<nav>
+  <a href="#mapa">1 · Mapa general</a><a href="#conceptos">2 · Conceptos</a><a href="#base">3 · La base de datos</a><a href="#apps">4 · Cada programa</a>
+  <a href="#cubo">5 · El cubo</a><a href="#algoritmo">6 · Paso a paso</a><a href="#sqlmdx">7 · SQL vs MDX</a><a href="#pbi">8 · Power BI</a>
+  <a href="#instalar">9 · Instalar</a><a href="#problemas">10 · Dificultades</a><a href="#objetivos">11 · Qué aprendiste</a><a href="#glosario">12 · Glosario</a>
+</nav>
+<main>
+
+<!-- ============ 1 MAPA ============ -->
+<section id="mapa">
+<h2><span class="n">1</span>El mapa general</h2>
+<p class="lead">El objetivo: convertir <b>120 mil filas de ventas</b> en <b>respuestas para la gerencia</b>. Cada programa hace una parte del camino.</p>
+<div class="card">
+<svg viewBox="0 0 1000 250" role="img" aria-label="Flujo general">
+  <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#12306b"/></marker></defs>
+  <g font-size="14" text-anchor="middle" fill="#fff" font-weight="700">
+    <rect x="10" y="70" width="140" height="90" rx="14" fill="#7b4fd1"/><text x="80" y="108">Archivo .bak</text><text x="80" y="128" font-weight="400" font-size="12">copia de la base</text>
+    <rect x="200" y="70" width="140" height="90" rx="14" fill="#2f5fc4"/><text x="270" y="108">SQL Server</text><text x="270" y="128" font-weight="400" font-size="12">tablas (relacional)</text>
+    <rect x="390" y="70" width="140" height="90" rx="14" fill="#1f9d63"/><text x="460" y="108">Analysis Services</text><text x="460" y="128" font-weight="400" font-size="12">el CUBO (OLAP)</text>
+    <rect x="580" y="70" width="140" height="90" rx="14" fill="#f08a24"/><text x="650" y="108">Power BI</text><text x="650" y="128" font-weight="400" font-size="12">dashboard</text>
+    <rect x="770" y="70" width="140" height="90" rx="14" fill="#d92b3a"/><text x="840" y="108">PDF + GitHub</text><text x="840" y="128" font-weight="400" font-size="12">la entrega</text>
+  </g>
+  <g stroke="#12306b" stroke-width="3" fill="none" marker-end="url(#ar)" class="flow">
+    <path d="M150,115 L196,115"/><path d="M340,115 L386,115"/><path d="M530,115 L576,115"/><path d="M720,115 L766,115"/></g>
+  <g font-size="12" fill="#5b6475" text-anchor="middle">
+    <text x="80" y="190">1 · Restaurar</text><text x="270" y="190">2 · Explorar</text><text x="460" y="190">3 · Modelar y procesar</text><text x="650" y="190">4 · Visualizar</text><text x="840" y="190">5 · Documentar</text>
+  </g>
+  <g font-size="12" fill="#12306b" text-anchor="middle"><text x="270" y="40">SSMS y sqlcmd lo consultan</text><text x="460" y="40">Visual Studio lo diseña · MDX lo consulta</text><text x="650" y="40">conexión “en vivo” al cubo</text></g>
+</svg>
+</div>
+<div class="grid">
+  <div class="card"><b>🎯 Objetivo del trabajo</b><br>Responder 3 preguntas de negocio de <i>Adventure Works</i> (fabricante de bicicletas): qué categorías venden más, qué territorios son rentables y cuáles son los 10 productos estrella.</div>
+  <div class="card"><b>🧠 Objetivo de aprendizaje</b><br>Entender el camino completo de un <b>Datawarehouse</b>: del dato crudo a un <b>cubo multidimensional</b> y a un <b>dashboard</b> que apoya decisiones.</div>
+  <div class="card"><b>📦 Resultado</b><br>Base restaurada, cubo procesado, 8 consultas SQL/MDX, dashboard de 3 páginas, PDF de 47 páginas y repo en GitHub.</div>
+</div>
+</section>
+
+<!-- ============ 2 CONCEPTOS ============ -->
+<section id="conceptos">
+<h2><span class="n">2</span>Los 4 conceptos que sostienen todo</h2>
+<p class="lead">Si entiendes estos cuatro, el resto es “solo herramientas”.</p>
+<div class="grid">
+<div class="card"><h3>① OLTP vs Datawarehouse</h3>
+<svg viewBox="0 0 440 210"><g font-size="13" text-anchor="middle">
+<rect x="10" y="20" width="190" height="130" rx="12" fill="#fde8ea" stroke="#d92b3a"/><text x="105" y="45" font-weight="700">OLTP (tienda en línea)</text><text x="105" y="70">miles de ventas por minuto</text><text x="105" y="90">muchas tablas pequeñas</text><text x="105" y="110">optimizado para ESCRIBIR</text><text x="105" y="135" fill="#d92b3a">“registrar una venta”</text>
+<rect x="240" y="20" width="190" height="130" rx="12" fill="#e9f8f0" stroke="#1f9d63"/><text x="335" y="45" font-weight="700">Datawarehouse (DW)</text><text x="335" y="70">historia ya limpia</text><text x="335" y="90">pocas tablas grandes</text><text x="335" y="110">optimizado para LEER</text><text x="335" y="135" fill="#1f9d63">“¿cuánto vendimos por año?”</text>
+<path d="M205,85 L235,85" stroke="#12306b" stroke-width="3" marker-end="url(#ar)" class="flow"/></g></svg>
+<p>La base que usamos (<code>AdventureWorksDW2022</code>) ya es un DW: la “W” significa <i>Warehouse</i>.</p></div>
+
+<div class="card"><h3>② Hechos y dimensiones</h3>
+<svg viewBox="0 0 440 210"><g font-size="13" text-anchor="middle">
+<rect x="20" y="30" width="180" height="120" rx="12" fill="#fff3d6" stroke="#f08a24"/><text x="110" y="55" font-weight="700">Tabla de HECHOS</text><text x="110" y="80">lo que se MIDE</text><text x="110" y="100">monto, costo, cantidad</text><text x="110" y="125" fill="#f08a24">“una fila por línea de venta”</text>
+<rect x="240" y="30" width="180" height="120" rx="12" fill="#e8f0fe" stroke="#2f5fc4"/><text x="330" y="55" font-weight="700">DIMENSIONES</text><text x="330" y="80">cómo se DESCRIBE</text><text x="330" y="100">fecha, producto, territorio</text><text x="330" y="125" fill="#2f5fc4">“por año, por categoría…”</text></g></svg>
+<p>Frase clave: <b>medidas</b> son los números; <b>dimensiones</b> son las formas de cortarlos.</p></div>
+
+<div class="card"><h3>③ Cubo OLAP</h3>
+<p>Es una forma de guardar los hechos <b>ya sumados</b> por cada combinación de dimensiones. Preguntar “ventas de Bicicletas en 2013” es leer una celda, no recorrer 60 mil filas. Lo veremos en la sección 5.</p></div>
+
+<div class="card"><h3>④ Dashboard</h3>
+<p>Es la pantalla donde el cubo se convierte en gráficos. Un buen dashboard responde <b>una pregunta por visual</b>. Aquí: una página por pregunta de negocio.</p></div>
+</div>
+</section>
+
+<!-- ============ 3 BASE ============ -->
+<section id="base">
+<h2><span class="n">3</span>La estructura de la base de datos</h2>
+<p class="lead">AdventureWorksDW2022 tiene 31 tablas. Usamos 7. Este es el modelo en <b>estrella</b> (con una rama “copo de nieve” en Producto).</p>
+<div class="card">
+<svg viewBox="0 0 1000 520" role="img" aria-label="Esquema en estrella">
+  <defs><marker id="a2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5b6475"/></marker></defs>
+  <g stroke="#5b6475" stroke-width="2.5" fill="none" marker-end="url(#a2)">
+    <path d="M330,200 L215,150"/><path d="M330,320 L215,360"/><path d="M670,200 L790,150"/><path d="M670,320 L790,360"/>
+    <path d="M500,380 L500,300" stroke-dasharray="5 4"/>
+    <path d="M150,410 L150,455" /><path d="M150,330 L150,300"/>
+  </g>
+  <!-- hechos -->
+  <g>
+    <rect x="330" y="150" width="340" height="105" rx="14" fill="#fff3d6" stroke="#f08a24" stroke-width="3"/>
+    <text x="500" y="178" text-anchor="middle" font-weight="800" font-size="16" fill="#b25f00">FactInternetSales · 60 398 filas</text>
+    <text x="500" y="200" text-anchor="middle" font-size="13">ProductKey · OrderDateKey · SalesTerritoryKey</text>
+    <text x="500" y="220" text-anchor="middle" font-size="13">SalesAmount · TotalProductCost · OrderQuantity</text>
+    <text x="500" y="240" text-anchor="middle" font-size="12" fill="#5b6475">venta por Internet (clientes)</text>
+    <rect x="330" y="285" width="340" height="105" rx="14" fill="#fff3d6" stroke="#f08a24" stroke-width="3"/>
+    <text x="500" y="313" text-anchor="middle" font-weight="800" font-size="16" fill="#b25f00">FactResellerSales · 60 855 filas</text>
+    <text x="500" y="335" text-anchor="middle" font-size="13">ProductKey · OrderDateKey · SalesTerritoryKey</text>
+    <text x="500" y="355" text-anchor="middle" font-size="13">SalesAmount · TotalProductCost · OrderQuantity</text>
+    <text x="500" y="375" text-anchor="middle" font-size="12" fill="#5b6475">venta a revendedores (tiendas)</text>
+  </g>
+  <!-- dimensiones -->
+  <g font-size="13" text-anchor="middle">
+    <rect x="40" y="70" width="190" height="90" rx="12" fill="#e8f0fe" stroke="#2f5fc4" stroke-width="2.5"/><text x="135" y="98" font-weight="800" font-size="15" fill="#12306b">DimDate · 3 652</text><text x="135" y="120">DateKey · CalendarYear</text><text x="135" y="140">CalendarQuarter · Mes</text>
+    <rect x="40" y="340" width="190" height="90" rx="12" fill="#e8f0fe" stroke="#2f5fc4" stroke-width="2.5"/><text x="135" y="368" font-weight="800" font-size="15" fill="#12306b">DimProduct · 606</text><text x="135" y="390">ProductKey</text><text x="135" y="410">EnglishProductName</text>
+    <rect x="770" y="70" width="190" height="90" rx="12" fill="#e8f0fe" stroke="#2f5fc4" stroke-width="2.5"/><text x="865" y="98" font-weight="800" font-size="15" fill="#12306b">DimSalesTerritory · 11</text><text x="865" y="120">Región · País</text><text x="865" y="140">Grupo</text>
+    <rect x="40" y="445" width="190" height="62" rx="12" fill="#eef0ff" stroke="#7b4fd1" stroke-width="2"/><text x="135" y="470" font-weight="700" fill="#4a2fa0">DimProductSubcategory · 37</text><text x="135" y="490" font-size="12">→ DimProductCategory · 4</text>
+  </g>
+  <text x="500" y="35" text-anchor="middle" font-size="15" fill="#5b6475">Una fila de HECHOS apunta (con llaves) a una fila de cada DIMENSIÓN</text>
+  <text x="780" y="430" font-size="13" fill="#5b6475">Las dos tablas de hechos comparten</text><text x="780" y="450" font-size="13" fill="#5b6475">las mismas 3 dimensiones</text>
+  <text x="780" y="480" font-size="13" fill="#7b4fd1" font-weight="700">Producto → Subcategoría →</text><text x="780" y="498" font-size="13" fill="#7b4fd1" font-weight="700">Categoría (copo de nieve)</text>
+</svg>
+</div>
+<div class="grid">
+<div class="card"><b>🔑 Llaves</b><br><code>ProductKey</code>, <code>OrderDateKey</code>, <code>SalesTerritoryKey</code> son números que “apuntan” a la dimensión. Es como un carné: la venta no guarda el nombre del producto, guarda su número.</div>
+<div class="card"><b>📐 Utilidad</b><br>No existe como columna. La calculamos: <code>SalesAmount − TotalProductCost</code>. Por eso la creamos como <i>medida calculada</i> en el cubo.</div>
+<div class="card"><b>🔍 Hallazgos de calidad</b><br>Datos de dic-2010 a ene-2014 (años incompletos). 209 productos sin subcategoría, pero ninguno con ventas, así que no estorban.</div>
+</div>
+</section>
+
+<!-- ============ 4 APPS ============ -->
+<section id="apps">
+<h2><span class="n">4</span>Qué es cada programa y para qué se usó</h2>
+<p class="lead">Dos <b>servidores</b> (guardan y calculan) y varios <b>clientes</b> (los usas para pedirles cosas).</p>
+<div class="card">
+<svg viewBox="0 0 1000 420" role="img" aria-label="Arquitectura">
+  <defs><marker id="a3" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#12306b"/></marker></defs>
+  <rect x="5" y="5" width="990" height="410" rx="18" fill="#fafbff" stroke="#c6d0ea" stroke-dasharray="6 5"/>
+  <text x="25" y="30" font-size="13" fill="#5b6475">Tu PC con Windows 11</text>
+  <!-- servidores -->
+  <rect x="330" y="230" width="150" height="110" rx="14" fill="#2f5fc4"/><text x="405" y="268" fill="#fff" text-anchor="middle" font-weight="800">SQL Server</text><text x="405" y="288" fill="#dfe8ff" text-anchor="middle" font-size="12">servicio MSSQLSERVER</text><text x="405" y="308" fill="#dfe8ff" text-anchor="middle" font-size="12">motor relacional</text><text x="405" y="326" fill="#dfe8ff" text-anchor="middle" font-size="12">T-SQL</text>
+  <rect x="560" y="230" width="150" height="110" rx="14" fill="#1f9d63"/><text x="635" y="268" fill="#fff" text-anchor="middle" font-weight="800">Analysis Services</text><text x="635" y="288" fill="#e0fff0" text-anchor="middle" font-size="12">servicio MSSQLServerOLAP…</text><text x="635" y="308" fill="#e0fff0" text-anchor="middle" font-size="12">motor OLAP (cubo)</text><text x="635" y="326" fill="#e0fff0" text-anchor="middle" font-size="12">MDX</text>
+  <path d="M480,285 L556,285" stroke="#12306b" stroke-width="3" marker-end="url(#a3)" class="flow"/><text x="518" y="272" font-size="11" text-anchor="middle" fill="#12306b">lee</text>
+  <!-- clientes -->
+  <g font-size="13" font-weight="700" text-anchor="middle" fill="#fff">
+    <rect x="30" y="60" width="150" height="62" rx="12" fill="#5b6475"/><text x="105" y="88">SSMS</text><text x="105" y="106" font-weight="400" font-size="11">editor de consultas</text>
+    <rect x="200" y="60" width="150" height="62" rx="12" fill="#5b6475"/><text x="275" y="88">sqlcmd</text><text x="275" y="106" font-weight="400" font-size="11">consola de SQL</text>
+    <rect x="390" y="60" width="170" height="62" rx="12" fill="#7b4fd1"/><text x="475" y="88">Visual Studio + SSDT</text><text x="475" y="106" font-weight="400" font-size="11">diseña el cubo</text>
+    <rect x="580" y="60" width="150" height="62" rx="12" fill="#f08a24"/><text x="655" y="88">Power BI</text><text x="655" y="106" font-weight="400" font-size="11">dashboard</text>
+    <rect x="750" y="60" width="220" height="62" rx="12" fill="#d92b3a"/><text x="860" y="88">PowerShell + AMO + ADOMD</text><text x="860" y="106" font-weight="400" font-size="11">crear y consultar por código</text>
+  </g>
+  <g stroke="#12306b" stroke-width="2.2" fill="none" marker-end="url(#a3)">
+    <path d="M105,122 C105,190 340,190 360,228"/><path d="M275,122 C275,190 380,190 385,228"/>
+    <path d="M475,122 C475,180 600,190 620,228"/><path d="M655,122 L645,228"/><path d="M860,122 C860,190 680,190 665,228"/>
+    <path d="M860,122 C860,200 450,170 440,228" stroke-dasharray="5 4"/>
+  </g>
+  <text x="500" y="390" font-size="13" text-anchor="middle" fill="#5b6475">Los clientes envían una petición → el servidor responde → el cliente la muestra. El servidor “vive” aunque cierres el cliente.</text>
+</svg>
+</div>
+<div class="grid">
+<div class="card app" style="--c:#2f5fc4"><span class="tag">SERVIDOR</span><h3>SQL Server 2025 Developer</h3>
+<dl><dt>Qué es</dt><dd>El programa que guarda las tablas y responde consultas SQL. Corre como servicio de Windows, siempre encendido.</dd>
+<dt>Para qué lo usamos</dt><dd>Aquí se <b>restauró</b> AdventureWorksDW2022 y de aquí lee el cubo sus datos.</dd></dl></div>
+
+<div class="card app" style="--c:#5b6475"><span class="tag">CLIENTE</span><h3>SSMS (SQL Server Management Studio)</h3>
+<dl><dt>Qué es</dt><dd>Ventana gráfica para hablar con SQL Server: escribes una consulta, pulsas Execute, ves el resultado.</dd>
+<dt>Para qué lo usamos</dt><dd>Ejecutar el script de restauración, explorar tablas y correr las consultas SQL de las 3 preguntas (capturas del PDF).</dd></dl></div>
+
+<div class="card app" style="--c:#5b6475"><span class="tag">CLIENTE</span><h3>sqlcmd</h3>
+<dl><dt>Qué es</dt><dd>La misma idea que SSMS, pero en la consola: <code>sqlcmd -S localhost -i script.sql</code>.</dd>
+<dt>Para qué lo usamos</dt><dd>Comprobar rápido datos y verificar que SQL y MDX dan las mismas cifras, sin abrir ventanas.</dd></dl></div>
+
+<div class="card app" style="--c:#1f9d63"><span class="tag">SERVIDOR</span><h3>SQL Server Analysis Services (SSAS)</h3>
+<dl><dt>Qué es</dt><dd>Un segundo servidor, especializado en <b>cubos</b>. Toma los datos de SQL Server, los <i>pre-calcula</i> por dimensiones y los guarda en formato multidimensional. Se le consulta con <b>MDX</b>.</dd>
+<dt>Para qué lo usamos</dt><dd>Aquí vive el cubo <code>Ventas AdventureWorks</code>. Modo elegido: <b>Multidimensional</b>.</dd></dl></div>
+
+<div class="card app" style="--c:#7b4fd1"><span class="tag">DISEÑO</span><h3>Visual Studio 2022 + “Analysis Services Projects”</h3>
+<dl><dt>Qué es</dt><dd>Visual Studio es un entorno de programación. La extensión (llamada <b>SSDT</b>) le añade el tipo de proyecto “Analysis Services”: un cubo se vuelve una carpeta con archivos que puedes editar y guardar en Git.</dd>
+<dt>Para qué lo usamos</dt><dd>Ver y documentar el cubo con sus diseñadores (abajo) y comprobar que el proyecto compila.</dd></dl></div>
+
+<div class="card app" style="--c:#f08a24"><span class="tag">VISUAL</span><h3>Power BI Desktop</h3>
+<dl><dt>Qué es</dt><dd>Programa de Microsoft para crear dashboards: gráficos, tablas, tarjetas, filtros.</dd>
+<dt>Para qué lo usamos</dt><dd>Conectarlo <b>en vivo</b> al cubo y mostrar las respuestas. Guarda todo en un archivo <code>.pbix</code>.</dd></dl></div>
+
+<div class="card app" style="--c:#d92b3a"><span class="tag">CÓDIGO</span><h3>PowerShell + AMO + ADOMD.NET</h3>
+<dl><dt>Qué es</dt><dd>PowerShell es la consola con scripts de Windows. <b>AMO</b> es una librería para <i>crear</i> objetos de Analysis Services por código. <b>ADOMD.NET</b> es la librería para <i>consultarlo</i> con MDX.</dd>
+<dt>Para qué lo usamos</dt><dd>Construir el cubo con un script repetible (<code>30-build-cube.ps1</code>) y ejecutar las consultas MDX (<code>42-show-mdx.ps1</code>).</dd></dl></div>
+
+<div class="card app" style="--c:#12306b"><span class="tag">ENTREGA</span><h3>Python, Pillow, WeasyPrint, Git y GitHub</h3>
+<dl><dt>Qué es</dt><dd>Python con <b>Pillow</b> dibuja los círculos y flechas en las capturas. <b>WeasyPrint</b> convierte HTML en PDF. <b>Git/GitHub</b> guardan la historia del proyecto.</dd>
+<dt>Para qué lo usamos</dt><dd>Anotar las capturas, generar el PDF de 47 páginas y publicar el repositorio.</dd></dl></div>
+
+<div class="card app" style="--c:#8a94a8"><span class="tag">APOYO</span><h3>winget, Microsoft Store, UI Automation</h3>
+<dl><dt>Qué es</dt><dd><code>winget</code> instala programas por comando. UI Automation es la API de Windows con la que un programa “ve” y pulsa botones de otras ventanas.</dd>
+<dt>Para qué lo usamos</dt><dd>Instalar Power BI y manejar las ventanas para tomar las capturas automáticamente.</dd></dl></div>
+</div>
+
+<h3 style="color:var(--azul);margin-top:26px">Dentro de Visual Studio: qué hace cada ventana</h3>
+<div class="card">
+<svg viewBox="0 0 1000 330" role="img" aria-label="Ventanas de Visual Studio">
+  <rect x="10" y="10" width="980" height="310" rx="10" fill="#f4f6fb" stroke="#9aa6c4"/>
+  <rect x="10" y="10" width="980" height="28" rx="10" fill="#2f2f7a"/><text x="30" y="30" fill="#fff" font-size="13">AdventureWorksCubo — Microsoft Visual Studio</text>
+  <rect x="20" y="48" width="160" height="30" fill="#dfe6f7"/><text x="30" y="68" font-size="12">Fecha.dim [Design] ×</text>
+  <rect x="20" y="82" width="740" height="180" fill="#fff" stroke="#c6d0ea"/><text x="390" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#12306b">② Diseñador (aquí editas el objeto)</text>
+  <rect x="30" y="122" width="210" height="130" fill="#eef3ff" stroke="#2f5fc4"/><text x="135" y="145" text-anchor="middle" font-size="12">Attributes</text><text x="135" y="165" text-anchor="middle" font-size="11" fill="#5b6475">Año · Trimestre · Mes</text>
+  <rect x="260" y="122" width="230" height="130" fill="#eef3ff" stroke="#2f5fc4"/><text x="375" y="145" text-anchor="middle" font-size="12">Hierarchies</text><text x="375" y="165" text-anchor="middle" font-size="11" fill="#5b6475">Año ▸ Trimestre ▸ Mes</text>
+  <rect x="510" y="122" width="240" height="130" fill="#eef3ff" stroke="#2f5fc4"/><text x="630" y="145" text-anchor="middle" font-size="12">Data Source View</text><text x="630" y="165" text-anchor="middle" font-size="11" fill="#5b6475">tabla DimDate</text>
+  <rect x="770" y="48" width="210" height="214" fill="#fff" stroke="#c6d0ea"/><text x="875" y="72" text-anchor="middle" font-size="14" font-weight="700" fill="#12306b">① Solution Explorer</text>
+  <g font-size="11.5" fill="#1b2230"><text x="782" y="98">▾ AdventureWorksCubo</text><text x="794" y="116">▸ Data Sources (.ds)</text><text x="794" y="134">▸ Data Source Views (.dsv)</text><text x="794" y="152">▸ Cubes (.cube)</text><text x="794" y="170">▸ Dimensions (.dim)</text><text x="806" y="188" fill="#2f5fc4">Fecha · Producto · Territorio</text></g>
+  <rect x="20" y="270" width="960" height="42" fill="#fff" stroke="#c6d0ea"/><text x="30" y="296" font-size="13" font-weight="700" fill="#12306b">③ Output / Error List</text><text x="210" y="296" font-size="12" fill="#5b6475">“Build: 1 succeeded” · “Deploy: 1 failed (edición no soportada)”</text>
+</svg>
+<table>
+<tr><th>Ventana</th><th>Para qué sirve</th></tr>
+<tr><td><b>① Solution Explorer</b></td><td>El “árbol de archivos” del proyecto: origen de datos, vista, cubo y dimensiones. Doble clic abre su diseñador.</td></tr>
+<tr><td><b>② Diseñadores</b></td><td><b>Dimension designer</b>: atributos y jerarquías. <b>Data Source View</b>: diagrama de tablas y relaciones. <b>Cube designer</b>: pestañas Cube Structure (medidas), Dimension Usage (qué dimensión se une a qué medida), Calculations (medidas calculadas en MDX), KPIs, Partitions, Browser (explorar el cubo).</td></tr>
+<tr><td><b>③ Output y Error List</b></td><td>Resultado de compilar y desplegar. Aquí vimos “0 errores” al compilar y el error del despliegue.</td></tr>
+<tr><td><b>Build</b> vs <b>Deploy</b></td><td><b>Build</b> revisa que los archivos estén bien. <b>Deploy</b> los <i>envía</i> a Analysis Services y lo procesa. Sin Deploy, el cubo solo existe como archivos.</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ============ 5 CUBO ============ -->
+<section id="cubo">
+<h2><span class="n">5</span>Cómo funciona el cubo</h2>
+<p class="lead">Un cubo tiene <b>ejes</b> (dimensiones) y en cada <b>celda</b> hay una medida ya calculada.</p>
+<div class="card">
+<svg viewBox="0 0 900 420" role="img" aria-label="Cubo">
+  <defs><marker id="a4" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#12306b"/></marker></defs>
+  <!-- cubo isométrico -->
+  <g transform="translate(120,60)">
+    <polygon points="0,120 200,120 260,70 60,70" fill="#cfe0ff" stroke="#2f5fc4" stroke-width="2"/>
+    <polygon points="0,120 200,120 200,320 0,320" fill="#e8f0fe" stroke="#2f5fc4" stroke-width="2"/>
+    <polygon points="200,120 260,70 260,270 200,320" fill="#b9cffc" stroke="#2f5fc4" stroke-width="2"/>
+    <!-- cuadricula frente -->
+    <g stroke="#2f5fc4" stroke-opacity=".35">
+      <line x1="50" y1="120" x2="50" y2="320"/><line x1="100" y1="120" x2="100" y2="320"/><line x1="150" y1="120" x2="150" y2="320"/>
+      <line x1="0" y1="170" x2="200" y2="170"/><line x1="0" y1="220" x2="200" y2="220"/><line x1="0" y1="270" x2="200" y2="270"/></g>
+    <!-- celda destacada -->
+    <rect x="100" y="220" width="50" height="50" fill="#f08a24" class="pulse"/><text x="125" y="250" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">$42,3M</text>
+    <!-- ejes -->
+    <path d="M0,335 L200,335" stroke="#12306b" stroke-width="3" marker-end="url(#a4)"/><text x="100" y="360" text-anchor="middle" font-weight="700" fill="#12306b">Fecha (Año ▸ Trimestre ▸ Mes)</text>
+    <path d="M-15,320 L-15,120" stroke="#12306b" stroke-width="3" marker-end="url(#a4)"/><text x="-30" y="220" text-anchor="middle" font-weight="700" fill="#12306b" transform="rotate(-90 -30 220)">Producto (Categoría ▸ Sub ▸ Producto)</text>
+    <path d="M210,330 L270,282" stroke="#12306b" stroke-width="3" marker-end="url(#a4)"/><text x="290" y="285" font-weight="700" fill="#12306b">Territorio</text>
+  </g>
+  <g font-size="14">
+    <rect x="470" y="70" width="400" height="290" rx="14" fill="#fff" stroke="#d9e0ef"/>
+    <text x="490" y="100" font-weight="800" fill="#12306b" font-size="16">La celda naranja es UNA respuesta</text>
+    <text x="490" y="130">Año = <tspan font-weight="700">2013</tspan></text>
+    <text x="490" y="152">Producto = <tspan font-weight="700">Bicicletas</tspan></text>
+    <text x="490" y="174">Medida = <tspan font-weight="700">Total Ventas</tspan></text>
+    <text x="490" y="205" fill="#d92b3a" font-weight="700">= $42 302 193,51</text>
+    <text x="490" y="240" fill="#5b6475">Sin cubo: sumar decenas de miles de filas.</text>
+    <text x="490" y="262" fill="#5b6475">Con cubo: leer un número ya calculado.</text>
+    <text x="490" y="300" font-weight="700" fill="#12306b">Operaciones típicas:</text>
+    <text x="490" y="322">• <tspan font-weight="700">Slice</tspan>: fijar un eje (solo 2013).</text>
+    <text x="490" y="342">• <tspan font-weight="700">Drill down</tspan>: bajar de Año a Trimestre.</text>
+  </g>
+</svg>
+</div>
+
+<div class="card"><h3>🎮 Juega con el cubo (cifras reales)</h3>
+<p>Elige un año y una categoría: el cubo “devuelve” la celda y se muestra la consulta MDX equivalente.</p>
+<div class="sel">
+<label>Año <select id="selA"><option>2011</option><option>2012</option><option selected>2013</option></select></label>
+<label>Categoría <select id="selC"><option>Accessories</option><option selected>Bikes</option><option>Clothing</option><option>Components</option></select></label>
+<span class="big" id="val">—</span></div>
+<pre id="mdx"></pre>
+<svg viewBox="0 0 900 120" id="bar"><rect x="0" y="0" width="900" height="120" fill="none"/></svg>
+</div>
+
+<div class="card"><h3>Jerarquías: bajar y subir de nivel (drill)</h3>
+<svg viewBox="0 0 960 230" role="img" aria-label="Jerarquías">
+  <g font-size="13" text-anchor="middle" font-weight="700">
+    <rect x="20" y="20" width="270" height="60" rx="10" fill="#e8f0fe" stroke="#2f5fc4"/><text x="155" y="45">Fecha</text><text x="155" y="65" font-weight="400" fill="#2f5fc4">Año ▸ Trimestre ▸ Mes</text>
+    <rect x="345" y="20" width="270" height="60" rx="10" fill="#e9f8f0" stroke="#1f9d63"/><text x="480" y="45">Producto</text><text x="480" y="65" font-weight="400" fill="#1f9d63">Categoría ▸ Subcategoría ▸ Producto</text>
+    <rect x="670" y="20" width="270" height="60" rx="10" fill="#fff3d6" stroke="#f08a24"/><text x="805" y="45">Territorio de Ventas</text><text x="805" y="65" font-weight="400" fill="#b25f00">Grupo ▸ País ▸ Región</text>
+  </g>
+  <g font-size="12.5" text-anchor="middle">
+    <text x="155" y="115">2013</text><text x="155" y="140" fill="#5b6475">2013 T1 · T2 · T3 · T4</text><text x="155" y="165" fill="#5b6475">Enero … Diciembre</text>
+    <text x="480" y="115">Bikes</text><text x="480" y="140" fill="#5b6475">Mountain Bikes · Road Bikes</text><text x="480" y="165" fill="#5b6475">Mountain-200 Black, 38</text>
+    <text x="805" y="115">North America</text><text x="805" y="140" fill="#5b6475">United States</text><text x="805" y="165" fill="#5b6475">Southwest</text>
+  </g>
+  <g stroke="#12306b" stroke-width="2.5" fill="none" marker-end="url(#a4)"><path d="M155,85 L155,100" /><path d="M480,85 L480,100"/><path d="M805,85 L805,100"/></g>
+  <text x="480" y="205" text-anchor="middle" font-size="13" fill="#5b6475">En Power BI, “bajar un nivel” es un clic: el cubo ya tiene los totales de cada nivel calculados.</text>
+</svg></div>
+
+<div class="card"><h3>Medidas: de dónde salen los números</h3>
+<svg viewBox="0 0 960 250" role="img" aria-label="Medidas">
+  <defs><marker id="a5" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#12306b"/></marker></defs>
+  <g font-size="13" font-weight="700" text-anchor="middle">
+    <rect x="20" y="20" width="200" height="70" rx="10" fill="#fff3d6" stroke="#f08a24"/><text x="120" y="48">Internet Monto de Ventas</text><text x="120" y="68" font-weight="400">SUMA(SalesAmount)</text>
+    <rect x="20" y="110" width="200" height="70" rx="10" fill="#fff3d6" stroke="#f08a24"/><text x="120" y="138">Internet Costo del Producto</text><text x="120" y="158" font-weight="400">SUMA(TotalProductCost)</text>
+    <rect x="20" y="200" width="200" height="40" rx="10" fill="#fff3d6" stroke="#f08a24"/><text x="120" y="226">… lo mismo para Reseller</text>
+    <rect x="330" y="55" width="220" height="90" rx="10" fill="#e9f8f0" stroke="#1f9d63"/><text x="440" y="85">Internet Utilidad</text><text x="440" y="108" font-weight="400">Monto − Costo</text><text x="440" y="128" font-weight="400" fill="#5b6475">(medida calculada, MDX)</text>
+    <rect x="660" y="30" width="270" height="70" rx="10" fill="#e8f0fe" stroke="#2f5fc4"/><text x="795" y="58">Utilidad Total</text><text x="795" y="80" font-weight="400">Internet + Reseller</text>
+    <rect x="660" y="120" width="270" height="70" rx="10" fill="#eef0ff" stroke="#7b4fd1"/><text x="795" y="148">Utilidad Top 10</text><text x="795" y="170" font-weight="400">solo para los 10 mejores productos</text>
+  </g>
+  <g stroke="#12306b" stroke-width="2.5" fill="none" marker-end="url(#a5)"><path d="M220,55 L326,90"/><path d="M220,145 L326,115"/><path d="M550,100 L656,70"/><path d="M795,100 L795,116"/></g>
+</svg>
+<p><b>Sumas</b> (azul/amarillo) las guarda el cubo. <b>Cálculos</b> (verde) se definen en MDX y se resuelven al consultar.</p></div>
+</section>
+
+<!-- ============ 6 ALGORITMO ============ -->
+<section id="algoritmo">
+<h2><span class="n">6</span>El algoritmo, paso a paso</h2>
+<p class="lead">Esto es exactamente lo que hicimos, en orden. Cada paso tiene su “por qué” y su comando.</p>
+<div class="card">
+<svg viewBox="0 0 960 150" role="img" aria-label="Pasos"><g font-size="12.5" text-anchor="middle" font-weight="700" fill="#fff">
+<g><circle cx="60" cy="50" r="28" fill="#7b4fd1"/><text x="60" y="55">1</text></g><g><circle cx="190" cy="50" r="28" fill="#2f5fc4"/><text x="190" y="55">2</text></g>
+<g><circle cx="320" cy="50" r="28" fill="#2f5fc4"/><text x="320" y="55">3</text></g><g><circle cx="450" cy="50" r="28" fill="#1f9d63"/><text x="450" y="55">4</text></g>
+<g><circle cx="580" cy="50" r="28" fill="#1f9d63"/><text x="580" y="55">5</text></g><g><circle cx="710" cy="50" r="28" fill="#f08a24"/><text x="710" y="55">6</text></g>
+<g><circle cx="840" cy="50" r="28" fill="#d92b3a"/><text x="840" y="55">7</text></g></g>
+<g stroke="#12306b" stroke-width="2.5" marker-end="url(#a5)" fill="none"><path d="M90,50 L158,50"/><path d="M220,50 L288,50"/><path d="M350,50 L418,50"/><path d="M480,50 L548,50"/><path d="M610,50 L678,50"/><path d="M740,50 L808,50"/></g>
+<g font-size="11.5" text-anchor="middle" fill="#1b2230"><text x="60" y="105">Preparar</text><text x="60" y="120">entorno</text><text x="190" y="105">Restaurar</text><text x="190" y="120">la base</text><text x="320" y="105">Explorar y</text><text x="320" y="120">elegir tablas</text><text x="450" y="105">Construir</text><text x="450" y="120">el cubo</text><text x="580" y="105">Procesar y</text><text x="580" y="120">consultar</text><text x="710" y="105">Dashboard</text><text x="710" y="120">Power BI</text><text x="840" y="105">Documentar</text><text x="840" y="120">y entregar</text></g></svg>
+</div>
+
+<details open><summary>Paso 1 · Preparar el entorno <span class="pill" style="background:#7b4fd1">una vez</span></summary>
+<p>Instalar SQL Server (motor), Analysis Services, Visual Studio con la extensión, SSMS y Power BI. Ver sección 9.</p><div class="tip"><b>Por qué:</b> sin el servidor OLAP no hay dónde guardar el cubo; sin la extensión, Visual Studio no sabe abrir proyectos de cubos.</div></details>
+
+<details><summary>Paso 2 · Restaurar la base <span class="pill" style="background:#2f5fc4">SQL Server</span></summary>
+<p>El <code>.bak</code> es una “foto” de la base. <b>Restaurar</b> = convertir esa foto en una base viva dentro de tu servidor.</p>
+<pre><span class="k">RESTORE DATABASE</span> AdventureWorksDW2022
+<span class="k">FROM DISK</span> = <span class="s">'C:\Users\Public\dp2\AdventureWorksDW2022.bak'</span>
+<span class="k">WITH MOVE</span> <span class="s">'AdventureWorksDW2022'</span>     <span class="k">TO</span> <span class="s">'…\DATA\AdventureWorksDW2022.mdf'</span>,
+     <span class="k">MOVE</span> <span class="s">'AdventureWorksDW2022_log'</span> <span class="k">TO</span> <span class="s">'…\DATA\AdventureWorksDW2022_log.ldf'</span>, REPLACE;</pre>
+<div class="tip"><b>Por qué MOVE:</b> el respaldo trae rutas de otra máquina; con MOVE le dices dónde guardar los archivos en la tuya. SQL Server además “actualiza” la base a su versión (en pantalla: <i>version 957 → 998</i>).</div></details>
+
+<details><summary>Paso 3 · Explorar y elegir tablas <span class="pill" style="background:#2f5fc4">SSMS</span></summary>
+<p>Se cuentan filas de cada tabla, se revisan llaves y calidad. De 31 tablas se eligen 7 según lo que piden las preguntas.</p>
+<table><tr><th>Pregunta</th><th>Qué necesita</th><th>Tablas</th></tr>
+<tr><td>1 Categorías por año/trimestre</td><td>ventas + tiempo + producto</td><td>Facts, DimDate, DimProduct, Subcategory, Category</td></tr>
+<tr><td>2 Territorios Internet vs Reseller</td><td>ventas + territorio + costo</td><td>Facts, DimSalesTerritory</td></tr>
+<tr><td>3 Top 10 productos</td><td>utilidad + producto + tiempo</td><td>Facts, DimProduct, DimDate</td></tr></table></details>
+
+<details><summary>Paso 4 · Construir el cubo <span class="pill" style="background:#1f9d63">AMO / Visual Studio</span></summary>
+<ol>
+<li><b>Origen de datos</b> (data source): la conexión a la base (<code>MSOLEDBSQL19</code>, localhost). SSAS necesita permiso de lectura: se lo dimos a su cuenta de servicio.</li>
+<li><b>Vista del origen</b> (DSV): las 7 tablas + relaciones. Aquí se añade la <i>columna calculada</i> <code>NombreTrimestre</code> («2013 T1»).</li>
+<li><b>Dimensiones</b>: Fecha, Producto, Territorio, con sus <i>atributos</i> y <i>jerarquías</i>.</li>
+<li><b>Cubo</b>: dos <i>grupos de medidas</i> (Internet, Reseller) unidos a las 3 dimensiones.</li>
+<li><b>Cálculos</b> en MDX: utilidad, totales y el conjunto Top 10.</li></ol>
+<div class="tip"><b>Por qué un script:</b> hacerlo con el mouse son ~100 clics que no se repiten. El script (<code>30-build-cube.ps1</code>) lo recrea en 20 segundos cada vez.</div></details>
+
+<details><summary>Paso 5 · Procesar y consultar <span class="pill" style="background:#1f9d63">SSAS</span></summary>
+<p><b>Procesar</b> = SSAS lee SQL Server, suma por cada combinación de dimensiones y guarda el resultado. Después de procesar, el estado es <code>Processed</code> y ya se puede consultar con MDX.</p>
+<pre><span class="c">// 1) AMO crea y procesa</span>
+$db.Process([ProcessType]::ProcessFull)
+<span class="c">// 2) ADOMD consulta</span>
+SELECT [Fecha].[Año-Trimestre-Mes].Levels(1).MEMBERS <span class="k">ON COLUMNS</span>, ...</pre></details>
+
+<details><summary>Paso 6 · Dashboard en Power BI <span class="pill" style="background:#f08a24">Power BI</span></summary>
+<p>Get data → <i>SQL Server Analysis Services database</i> → <b>Connect live</b>. Después, cada visual es un “campo del cubo” (por ejemplo <code>Fecha.Año</code> + medida <code>Total Ventas</code>). Ver sección 8.</p></details>
+
+<details><summary>Paso 7 · Documentar y entregar <span class="pill" style="background:#d92b3a">Python / Git</span></summary>
+<p>Capturas → anotarlas (círculos y flechas) → PDF → repositorio. Todo con scripts para poder repetirlo si algo cambia.</p></details>
+</section>
+
+<!-- ============ 7 SQL vs MDX ============ -->
+<section id="sqlmdx">
+<h2><span class="n">7</span>La misma pregunta en SQL y en MDX</h2>
+<p class="lead">Pregunta 3: <i>“¿Cuáles son los 10 productos más rentables?”</i></p>
+<div class="two">
+<div class="card"><span class="pill" style="background:#2f5fc4">SQL · sobre las tablas</span>
+<pre><span class="k">SELECT TOP</span> (10) p.EnglishProductName,
+       <span class="k">SUM</span>(v.SalesAmount - v.TotalProductCost) <span class="k">AS</span> utilidad
+<span class="k">FROM</span> (<span class="k">SELECT</span> ProductKey, SalesAmount, TotalProductCost
+      <span class="k">FROM</span> FactInternetSales
+      <span class="k">UNION ALL</span>
+      <span class="k">SELECT</span> ProductKey, SalesAmount, TotalProductCost
+      <span class="k">FROM</span> FactResellerSales) v
+<span class="k">JOIN</span> DimProduct p <span class="k">ON</span> p.ProductKey = v.ProductKey
+<span class="k">GROUP BY</span> p.EnglishProductName
+<span class="k">ORDER BY</span> utilidad <span class="k">DESC</span>;</pre>
+<p>Tú le dices <b>cómo</b>: unir, agrupar, sumar, ordenar.</p></div>
+<div class="card"><span class="pill" style="background:#1f9d63">MDX · sobre el cubo</span>
+<pre><span class="k">SELECT</span>
+ { [Measures].[Utilidad Total],
+   [Measures].[Total Ventas] } <span class="k">ON COLUMNS</span>,
+ <span class="k">TOPCOUNT</span>(
+   <span class="k">NONEMPTY</span>([Producto].[…].Levels(3).MEMBERS,
+             [Measures].[Utilidad Total]),
+   10, [Measures].[Utilidad Total]) <span class="k">ON ROWS</span>
+<span class="k">FROM</span> [Ventas AdventureWorks]</pre>
+<p>Tú le dices <b>qué ejes</b> quieres; el cubo ya sabe sumar.</p></div>
+</div>
+<div class="card">
+<svg viewBox="0 0 960 190" role="img" aria-label="Comparación">
+  <g font-size="13" text-anchor="middle" font-weight="700" fill="#fff">
+    <rect x="20" y="30" width="200" height="60" rx="10" fill="#2f5fc4"/><text x="120" y="66">Tablas de hechos</text>
+    <rect x="270" y="30" width="200" height="60" rx="10" fill="#2f5fc4"/><text x="370" y="66">JOIN + GROUP BY + SUM</text>
+    <rect x="740" y="30" width="200" height="60" rx="10" fill="#f08a24"/><text x="840" y="66">Mismo resultado</text>
+    <rect x="20" y="110" width="200" height="60" rx="10" fill="#1f9d63"/><text x="120" y="146">Cubo ya procesado</text>
+    <rect x="270" y="110" width="200" height="60" rx="10" fill="#1f9d63"/><text x="370" y="146">Ejes + TOPCOUNT</text></g>
+  <g stroke="#12306b" stroke-width="2.5" fill="none" marker-end="url(#a5)"><path d="M220,60 L266,60"/><path d="M470,60 L736,60"/><path d="M220,140 L266,140"/><path d="M470,140 C600,140 700,95 736,80"/></g>
+  <text x="600" y="30" font-size="12" fill="#5b6475" text-anchor="middle">Comprobamos que ambos dan 872 822,12 para Mountain-200 Black, 38</text>
+</svg></div>
+<div class="note"><b>Para qué hacer las dos:</b> si SQL y MDX coinciden, el cubo está bien construido. Es una “prueba de cordura”.</div>
+</section>
+
+<!-- ============ 8 PBI ============ -->
+<section id="pbi">
+<h2><span class="n">8</span>Power BI: conexión en vivo vs importar</h2>
+<div class="two">
+<div class="card"><h3>🔴 Connect live (lo que usamos)</h3>
+<svg viewBox="0 0 420 150"><g font-size="12.5" text-anchor="middle" font-weight="700" fill="#fff">
+<rect x="10" y="40" width="120" height="60" rx="10" fill="#f08a24"/><text x="70" y="75">Power BI</text>
+<rect x="290" y="40" width="120" height="60" rx="10" fill="#1f9d63"/><text x="350" y="68">Cubo</text><text x="350" y="86" font-weight="400" font-size="11">en SSAS</text></g>
+<path d="M130,60 L286,60" stroke="#12306b" stroke-width="3" marker-end="url(#a5)" class="flow" fill="none"/><path d="M286,82 L130,82" stroke="#12306b" stroke-width="3" marker-end="url(#a5)" class="flow" fill="none"/>
+<text x="210" y="50" font-size="11" text-anchor="middle" fill="#12306b">pide</text><text x="210" y="102" font-size="11" text-anchor="middle" fill="#12306b">responde</text></svg>
+<p>No copia datos. Cada gráfico hace una consulta al cubo. Siempre ves lo último. El modelo (medidas, jerarquías) <b>vive en el cubo</b>, no en Power BI.</p></div>
+<div class="card"><h3>⚪ Import (no usado)</h3>
+<svg viewBox="0 0 420 150"><g font-size="12.5" text-anchor="middle" font-weight="700" fill="#fff">
+<rect x="10" y="40" width="120" height="60" rx="10" fill="#f08a24"/><text x="70" y="68">Power BI</text><text x="70" y="86" font-weight="400" font-size="11">con su copia</text>
+<rect x="290" y="40" width="120" height="60" rx="10" fill="#8a94a8"/><text x="350" y="75">Origen</text></g>
+<path d="M286,70 L134,70" stroke="#5b6475" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#a5)" fill="none"/><text x="210" y="60" font-size="11" text-anchor="middle" fill="#5b6475">una sola vez / al refrescar</text></svg>
+<p>Copia los datos dentro del .pbix. Es más rápido sin conexión, pero se desactualiza y duplica el modelo. El desafío pedía conectar <i>al cubo</i>, por eso usamos live.</p></div>
+</div>
+<div class="card"><h3>Qué hay dentro del archivo .pbix</h3>
+<svg viewBox="0 0 960 230">
+<g font-size="12.5"><rect x="20" y="20" width="250" height="190" rx="12" fill="#fff" stroke="#c6d0ea"/><text x="145" y="46" text-anchor="middle" font-weight="800" fill="#12306b">Dashboard-AdventureWorks.pbix</text>
+<text x="40" y="76">📄 Connections</text><text x="150" y="76" fill="#5b6475" font-size="11">→ servidor y cubo</text>
+<text x="40" y="100">📁 Report/definition</text><text x="40" y="122" fill="#5b6475" font-size="11">  pages/ P1, P2, P3</text><text x="40" y="142" fill="#5b6475" font-size="11">    visuals/ un JSON por gráfico</text>
+<text x="40" y="170">📄 Version, Settings, Metadata</text></g>
+<g stroke="#12306b" stroke-width="2.5" fill="none" marker-end="url(#a5)"><path d="M270,115 L350,115"/></g>
+<g font-size="12.5"><rect x="360" y="20" width="580" height="190" rx="12" fill="#0f1830"/>
+<text x="380" y="48" fill="#8aa0d6">// un visual (extracto)</text>
+<text x="380" y="72" fill="#dfe8ff">"visualType": "columnChart",</text>
+<text x="380" y="94" fill="#dfe8ff">"Category": Fecha . Año,</text>
+<text x="380" y="116" fill="#dfe8ff">"Series":   Producto . Categoría,</text>
+<text x="380" y="138" fill="#dfe8ff">"Y":        Measures . Total Ventas</text>
+<text x="380" y="176" fill="#8be9a8">Un gráfico = “qué eje, qué serie, qué medida”.</text></g></svg>
+<p>Lo descubrimos guardando un visual de prueba y leyendo el archivo: un <code>.pbix</code> es un zip con JSON. Así pudimos <b>generar las 3 páginas por código</b>.</p></div>
+</section>
+
+<!-- ============ 9 INSTALAR ============ -->
+<section id="instalar">
+<h2><span class="n">9</span>Cómo descargar e instalar todo, paso por paso</h2>
+<p class="lead">Dos caminos: el <b>comando</b> (lo que hicimos) y el <b>mouse</b> (lo que harías a mano).</p>
+
+<div class="step"><div class="b">1</div><div class="t"><h4>La base de datos (.bak)</h4>
+<p>Descarga <b>AdventureWorksDW2022.bak</b> de <code>github.com/Microsoft/sql-server-samples/releases/tag/adventureworks</code> (sección “Data Warehouse”). Pesa unos 97 MB. Elige el año compatible con tu SQL Server.</p>
+<pre>Invoke-WebRequest <span class="s">"…/AdventureWorksDW2022.bak"</span> -OutFile C:\Users\Public\dp2\AdventureWorksDW2022.bak</pre>
+<div class="note">Déjalo en una carpeta que el <b>servicio</b> de SQL Server pueda leer. Si lo dejas en tu Escritorio, el servicio no tiene permiso.</div></div></div>
+
+<div class="step"><div class="b">2</div><div class="t"><h4>SQL Server 2025 (motor) + SSMS</h4>
+<p>Descarga <b>SQL Server 2025 Developer</b> (gratis, uso de aprendizaje) del sitio de Microsoft y ejecuta el instalador. Con el mouse: <i>Custom → New SQL Server stand-alone → Database Engine Services</i>. Instala también <b>SSMS</b>.</p>
+<pre>winget install Microsoft.SQLServer.2025.Developer
+winget install Microsoft.SQLServerManagementStudio</pre></div></div>
+
+<div class="step"><div class="b">3</div><div class="t"><h4>Analysis Services en modo <u>Multidimensional</u></h4>
+<p>Es una característica más del instalador de SQL Server. Con el mouse: <i>Installation → New SQL Server stand-alone or add features → Analysis Services → modo “Multidimensional and Data Mining”</i>. Por comando (pide permiso de administrador/UAC):</p>
+<pre>SETUP.EXE /Q /ACTION=Install /FEATURES=AS /INSTANCENAME=MSSQLSERVER ^
+  /ASSERVERMODE=MULTIDIMENSIONAL ^
+  /ASSYSADMINACCOUNTS="TU-PC\tu-usuario" ^
+  /IACCEPTSQLSERVERLICENSETERMS</pre>
+<div class="tip">Resultado: aparece el servicio <code>MSSQLServerOLAPService</code> en estado Running.</div></div></div>
+
+<div class="step"><div class="b">4</div><div class="t"><h4>Visual Studio 2022 + extensión</h4>
+<p>Instala <b>Visual Studio 2022 Community</b>. Luego añade la extensión <b>Analysis Services Projects</b>: en Visual Studio, <i>Extensions → Manage Extensions → buscar “Analysis Services Projects” → Download</i>; se instala al cerrar. (Nosotros bajamos el .vsix del Marketplace e instalamos con <code>VSIXInstaller.exe /quiet</code>.)</p></div></div>
+
+<div class="step"><div class="b">5</div><div class="t"><h4>Power BI Desktop</h4>
+<pre>winget install --id 9NTXR16HNW1T --source msstore</pre>
+<p>o desde la Microsoft Store: buscar “Power BI Desktop”. Es gratuito.</p></div></div>
+
+<div class="step"><div class="b">6</div><div class="t"><h4>Comprobar que todo funciona</h4>
+<pre>Get-Service MSSQLSERVER, MSSQLServerOLAPService   <span class="c"># deben decir Running</span>
+sqlcmd -S localhost -E -C -Q "SELECT @@VERSION"</pre>
+<div class="note"><code>-C</code> significa “confío en el certificado”: tu servidor local usa uno autofirmado y sin esa opción el cliente lo rechaza.</div></div></div>
+
+<h3 style="color:var(--azul)">Y después del arranque: flujo de trabajo en el día a día</h3>
+<table><tr><th>Quiero…</th><th>Hago…</th></tr>
+<tr><td>Recrear el cubo desde cero</td><td><code>scripts\30-build-cube.ps1</code></td></tr>
+<tr><td>Ver un resultado MDX</td><td><code>scripts\42-show-mdx.ps1 -File mdx\q3-top10-productos.mdx</code></td></tr>
+<tr><td>Abrir el cubo como proyecto</td><td>doble clic en <code>cubo\AdventureWorksCubo.sln</code></td></tr>
+<tr><td>Regenerar el dashboard</td><td><code>python3 scripts/60-build-pbix.py</code></td></tr>
+<tr><td>Regenerar el PDF</td><td><code>uv run --with weasyprint --with pillow --with numpy python scripts/90-build-pdf.py</code></td></tr></table>
+</section>
+
+<!-- ============ 10 PROBLEMAS ============ -->
+<section id="problemas">
+<h2><span class="n">10</span>Las dificultades que aparecieron (y cómo se resolvieron)</h2>
+<p class="lead">En proyectos reales casi nada funciona a la primera. Esto es lo valioso: el <b>síntoma → causa → arreglo</b>.</p>
+<div class="tl">
+<div class="it"><b>Nombres con tilde salían corruptos</b> (<code>Categor��a</code>)<br><i>Causa:</i> Windows PowerShell 5.1 lee un .ps1 sin BOM como ANSI. <i>Arreglo:</i> guardar los scripts con BOM UTF-8.</div>
+<div class="it"><b>El cubo procesaba mal: “la llave de atributo no se encuentra”</b><br><i>Causa:</i> 209 productos sin subcategoría (nulos). <i>Arreglo:</i> miembro desconocido “Sin asignar”. (Luego comprobamos que no tienen ventas.)</div>
+<div class="it"><b>MDX fallaba: “LEVELS espera una jerarquía”</b><br><i>Causa:</i> los nombres con tilde estaban corruptos (el problema anterior) y la dimensión y un atributo se llamaban igual. <i>Arreglo:</i> BOM + renombrar el atributo.</div>
+<div class="it"><b>Los trimestres salían solo como “1, 2, 3, 4”</b><br><i>Causa:</i> ambiguos entre años. <i>Arreglo:</i> columna calculada “2013 T1”; así ordena cronológicamente como texto.</div>
+<div class="it"><b>Visual Studio se colgaba sin mostrar nada</b><br><i>Causa:</i> una ventana de inicio de sesión (bloqueante) que no se veía en modo comando. <i>Arreglo:</i> abrir con interfaz y pulsar “Skip and add accounts later”. Después, una encuesta “User Feedback” bloqueaba la interfaz.</div>
+<div class="it"><b>El despliegue desde Visual Studio falla</b><br><i>Causa:</i> “edición StandardDeveloper64 no soportada por el cliente”: la extensión es anterior a SQL Server 2025. <i>Arreglo:</i> desplegar con AMO (mismo resultado). Se documentó con honestidad en el PDF.</div>
+<div class="it"><b>SSMS no aceptaba <code>-E</code> y rechazaba el certificado</b><br><i>Causa:</i> SSMS 22 cambió su línea de comandos y exige cifrado. <i>Arreglo:</i> sin <code>-E</code> y marcar “Trust Server Certificate”.</div>
+<div class="it"><b>Power BI: “el archivo está corrupto”</b> al abrir el .pbix generado<br><i>Causa:</i> el archivo <code>SecurityBindings</code> es una firma del contenido. <i>Arreglo:</i> omitirlo; Power BI lo regenera al guardar.</div>
+<div class="it"><b>El filtro “Top 10” de Power BI se ignoraba en silencio</b><br><i>Causa:</i> formato de filtro no reconocido. <i>Arreglo mejor:</i> hacerlo en el cubo: conjunto “Top 10 Productos” + medidas “Utilidad Top 10” y “Ventas Top 10”.</div>
+<div class="it"><b>Las tablas anchas se partían en la consola</b><br><i>Causa:</i> Windows Terminal ignora el tamaño de ventana. <i>Arreglo:</i> consola clásica y mostrar los trimestres en bloques de 7.</div>
+<div class="it"><b>Se fue la luz</b> a mitad de la tarea<br><i>Arreglo:</i> como todo estaba en scripts y en disco (servicios automáticos, cubo ya procesado), se retomó sin repetir el trabajo.</div>
+<div class="it ok"><b>Lección general</b><br>Automatizar (scripts) hizo que cada error se arreglara una vez y se pudiera <b>repetir</b> todo. Eso es lo que separa un trabajo manual frágil de uno reproducible.</div>
+</div>
+</section>
+
+<!-- ============ 11 OBJETIVOS ============ -->
+<section id="objetivos">
+<h2><span class="n">11</span>Qué aprendiste (objetivos de aprendizaje)</h2>
+<div class="grid">
+<div class="card"><b>🧱 Modelado</b><br>Distinguir hechos y dimensiones, leer un esquema en estrella/copo de nieve y elegir qué tablas necesita cada pregunta.</div>
+<div class="card"><b>🧊 OLAP</b><br>Qué es un cubo, qué son jerarquías, atributos, medidas y grupos de medidas; qué significa “procesar”.</div>
+<div class="card"><b>🔎 Consultas</b><br>Contestar lo mismo con SQL (tablas) y MDX (cubo) y verificar que coinciden.</div>
+<div class="card"><b>📊 BI</b><br>Conectar una herramienta de visualización en vivo a un cubo y diseñar un visual por pregunta.</div>
+<div class="card"><b>📝 Análisis</b><br>Convertir números en mensajes: crecimiento, dependencia de pocos productos, canal con margen casi nulo.</div>
+<div class="card"><b>⚙️ Ingeniería</b><br>Automatizar, documentar con evidencia y versionar (Git). Depurar con método: síntoma → causa → arreglo.</div>
+</div>
+<div class="card"><h3>Lo que la gerencia aprende de tus datos</h3>
+<svg viewBox="0 0 960 200">
+<g font-size="12.5"><text x="20" y="22" font-weight="700" fill="#12306b">Margen por canal</text>
+<rect x="20" y="34" width="440" height="26" fill="#e8f0fe"/><rect x="20" y="34" width="181" height="26" fill="#1f9d63"/><text x="28" y="52" fill="#fff" font-weight="700">Internet 41,15 %</text>
+<rect x="20" y="70" width="440" height="26" fill="#e8f0fe"/><rect x="20" y="70" width="2.6" height="26" fill="#d92b3a"/><text x="28" y="88" fill="#1b2230" font-weight="700" dx="8">Revendedor 0,58 %</text>
+<text x="20" y="130" font-weight="700" fill="#12306b">Peso de cada canal</text>
+<rect x="20" y="142" width="440" height="26" fill="#1f9d63"/><rect x="20" y="142" width="322" height="26" fill="#d92b3a"/><text x="28" y="160" fill="#fff" font-weight="700">Revendedor 73 % de ventas</text><text x="350" y="160" fill="#fff" font-weight="700">Internet 27 %</text></g>
+<g font-size="12.5"><text x="500" y="22" font-weight="700" fill="#12306b">Ventas por año (millones de $)</text>
+<g fill="#2f5fc4"><rect x="520" y="130" width="60" height="38" /><rect x="610" y="96" width="60" height="72"/><rect x="700" y="46" width="60" height="122"/></g>
+<text x="550" y="186" text-anchor="middle">2011 · 25,3</text><text x="640" y="186" text-anchor="middle">2012 · 34,0</text><text x="730" y="186" text-anchor="middle">2013 · 49,9</text>
+<text x="850" y="90" font-weight="700" fill="#1f9d63">+34,7 % → +46,7 %</text><text x="850" y="110" fill="#5b6475">crecimiento anual</text></g></svg></div>
+<div class="note"><b>Si la ingeniera te pregunta, tienes que poder explicar:</b> (1) por qué un cubo es más rápido que sumar filas; (2) qué es una jerarquía y un grupo de medidas; (3) por qué la utilidad es una medida calculada; (4) por qué usaste conexión en vivo; (5) por qué el despliegue desde Visual Studio falló y cómo lo resolviste.</div>
+</section>
+
+<!-- ============ 12 GLOSARIO ============ -->
+<section id="glosario">
+<h2><span class="n">12</span>Glosario rápido</h2>
+<dl class="glos card">
+<dt>Datawarehouse (DW)</dt><dd>Base de datos preparada para analizar historia, no para registrar ventas del día a día.</dd>
+<dt>Tabla de hechos</dt><dd>Tabla con lo que se mide (monto, costo, cantidad). Una fila por evento.</dd>
+<dt>Dimensión</dt><dd>Tabla que describe los hechos (fecha, producto, territorio).</dd>
+<dt>Llave sustituta (key)</dt><dd>Número que une un hecho con su dimensión (ProductKey).</dd>
+<dt>Esquema en estrella / copo de nieve</dt><dd>Hechos al centro y dimensiones alrededor; copo de nieve cuando una dimensión se parte en varias tablas (Producto → Subcategoría → Categoría).</dd>
+<dt>Cubo OLAP</dt><dd>Estructura que guarda las medidas ya sumadas por cada combinación de dimensiones.</dd>
+<dt>Atributo / jerarquía / nivel</dt><dd>Atributo: una columna útil (Año). Jerarquía: un camino ordenado de atributos (Año ▸ Trimestre ▸ Mes). Nivel: cada escalón.</dd>
+<dt>Medida / grupo de medidas</dt><dd>Medida: número que se suma. Grupo de medidas: las medidas que vienen de una misma tabla de hechos.</dd>
+<dt>Medida calculada</dt><dd>Número que se obtiene con una fórmula MDX sobre otras medidas (Utilidad = Monto − Costo).</dd>
+<dt>Procesar</dt><dd>Leer los datos de origen y llenar el cubo.</dd>
+<dt>Desplegar (deploy)</dt><dd>Enviar la definición del cubo al servidor.</dd>
+<dt>MDX</dt><dd>Lenguaje para consultar cubos (como SQL, pero con ejes y celdas).</dd>
+<dt>T-SQL</dt><dd>El SQL de SQL Server.</dd>
+<dt>Conexión en vivo</dt><dd>Power BI consulta la fuente cada vez, sin guardar una copia.</dd>
+<dt>AMO / ADOMD.NET</dt><dd>Librerías de .NET para crear (AMO) y consultar (ADOMD) Analysis Services por código.</dd>
+<dt>SSDT</dt><dd>Herramientas de datos de SQL Server para Visual Studio: lo que añade el tipo de proyecto “Analysis Services”.</dd>
+</dl>
+</section>
+
+</main>
+<footer>Guía creada a partir del Desafío Práctico 2 · DMD941 · Los números son reales y salen de tu cubo y de tu base.</footer>
+
+<script>
+const D={2011:{Accessories:45596.79,Bikes:23442755.83,Clothing:136624.14,Components:1643351.88},
+2012:{Accessories:147254.57,Bikes:28378924.02,Clothing:760133.09,Components:4749805.04},
+2013:{Accessories:1047139.51,Bikes:42302193.51,Clothing:1202657.69,Components:5374393.77}};
+const fmt=n=>'$'+n.toLocaleString('es-SV',{minimumFractionDigits:2,maximumFractionDigits:2});
+function upd(){const a=document.getElementById('selA').value,c=document.getElementById('selC').value,v=D[a][c];
+document.getElementById('val').textContent=fmt(v);
+document.getElementById('mdx').textContent=
+`SELECT { [Measures].[Total Ventas] } ON COLUMNS
+FROM [Ventas AdventureWorks]
+WHERE ( [Fecha].[Año].&[${a}], [Producto].[Categoría].&[${c}] )`;
+const cats=Object.keys(D[a]);const max=Math.max(...cats.map(k=>D[a][k]));
+let s='';cats.forEach((k,i)=>{const w=Math.max(2,D[a][k]/max*620),y=8+i*28;
+s+=`<text x="0" y="${y+14}" font-size="13">${k}</text><rect x="110" y="${y}" width="${w}" height="20" rx="4" fill="${k===c?'#f08a24':'#9fb7ee'}"/><text x="${116+w}" y="${y+15}" font-size="12">${fmt(D[a][k])}</text>`});
+document.getElementById('bar').innerHTML=s;}
+['selA','selC'].forEach(i=>document.getElementById(i).addEventListener('change',upd));upd();
+</script>
+</body>
+</html>
